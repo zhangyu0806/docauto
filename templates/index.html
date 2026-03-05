@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业文档自动化工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .tool-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .tool-desc {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .tool-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .tool-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .pricing {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .pricing h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .pricing-table th, .pricing-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .pricing-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        .pricing-table tr:hover {
+            background: #f8f9fa;
+        }
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 企业文档自动化工具</h1>
+            <p>批量处理PDF发票/合同，自动提取表格数据到Excel，智能清洗数据，批量生成Word文档</p>
+        </div>
+
+        <div class="tools-grid">
+            <div class="tool-card">
+                <div class="tool-icon">📊</div>
+                <div class="tool-title">PDF → Excel</div>
+                <div class="tool-desc">
+                    自动识别PDF中的表格结构，支持多页PDF批量处理，保留原始格式。
+                    <br><br>
+                    <strong>适用场景：</strong>发票批量处理、财务报表提取、合同条款整理
+                </div>
+                <a href="/pdf-to-excel" class="tool-btn">立即使用</a>
+            </div>
+
+            <div class="tool-card">
+                <div class="tool-icon">🧹</div>
+                <div class="tool-title">Excel数据清洗</div>
+                <div class="tool-desc">
+                    自动去重、删除空行、统一文本格式、标准化日期和电话格式。
+                    <br><br>
+                    <strong>适用场景：</strong>手动录入的数据整理、多源数据合并、格式标准化
+                </div>
+                <a href="/excel-clean" class="tool-btn">立即使用</a>
+            </div>
+
+            <div class="tool-card">
+                <div class="tool-icon">📝</div>
+                <div class="tool-title">Word模板生成</div>
+                <div class="tool-desc">
+                    支持Jinja2模板语法，批量生成合同、标书等文档，自动填充数据。
+                    <br><br>
+                    <strong>适用场景：</strong>批量生成合同、标书文档生成、证书批量制作
+                </div>
+                <a href="/template-generate" class="tool-btn">立即使用</a>
+            </div>
+        </div>
+
+        <div class="pricing">
+            <h2>💰 服务定价</h2>
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>服务类型</th>
+                        <th>价格</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>PDF处理</td>
+                        <td>0.2-0.5元/页</td>
+                        <td>根据复杂度定价</td>
+                    </tr>
+                    <tr>
+                        <td>Excel清洗</td>
+                        <td>0.1-0.3元/行</td>
+                        <td>根据数据量定价</td>
+                    </tr>
+                    <tr>
+                        <td>Word生成</td>
+                        <td>1-5元/份</td>
+                        <td>根据模板复杂度</td>
+                    </tr>
+                    <tr>
+                        <td>定制开发</td>
+                        <td>面议</td>
+                        <td>根据需求评估</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="text-align: center; margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px;">
+                <strong>🎁 新客户福利</strong><br>
+                免费测试5页，满意再谈合作！
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>💼 适用行业</strong></p>
+            <p>律所 - 合同条款提取、案件文档整理</p>
+            <p>财务公司 - 发票批量处理、报表自动化</p>
+            <p>招投标 - 标书文档生成、格式统一</p>
+            <p>制造业 - 订单处理、合同生成</p>
+            <br>
+            <p><strong>技术支持</strong> | 企业文档自动化团队 | 专注AI自动化 + B2B服务</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF转Excel - 企业文档自动化</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .upload-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .upload-btn:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+        .options {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .option-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .file-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            display: none;
+        }
+        .file-info.show {
+            display: block;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .loading.show {
+            display: block;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .tips {
+            margin-top: 30px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .tips h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        .tips ul {
+            margin-left: 20px;
+        }
+        .tips li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回首页</a>
+        
+        <h1>📊 PDF转Excel</h1>
+        <p class="subtitle">自动识别PDF中的表格数据并导出到Excel</p>
+
+        <form id="uploadForm">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <p style="margin-bottom: 15px;">点击或拖拽上传PDF文件</p>
+                <label class="upload-btn">
+                    选择文件
+                    <input type="file" id="fileInput" accept=".pdf" required>
+                </label>
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+
+            <div class="options">
+                <div class="option-item">
+                    <input type="checkbox" id="useOcr">
+                    <label for="useOcr">启用OCR（针对扫描版PDF，处理时间较长）</label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>开始处理</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在处理PDF，请稍候...</p>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="tips">
+            <h3>💡 使用提示</h3>
+            <ul>
+                <li>支持包含表格的PDF文件（发票、报表、合同等）</li>
+                <li>多页PDF会自动提取所有页面的表格</li>
+                <li>每个表格会保存为Excel中的独立工作表</li>
+                <li>如果表格识别不准确，请尝试勾选"启用OCR"</li>
+                <li>文件大小限制：50MB</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const uploadArea = document.getElementById('uploadArea');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files[0]) {
+                const file = this.files[0];
+                const size = (file.size / 1024 / 1024).toFixed(2);
+                fileInfo.innerHTML = `✅ 已选择: <strong>${file.name}</strong> (${size} MB)`;
+                fileInfo.classList.add('show');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // 拖拽上传
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#667eea';
+            uploadArea.style.background = '#f8f9ff';
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ddd';
+            uploadArea.style.background = 'white';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ddd';
+            uploadArea.style.background = 'white';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].name.endsWith('.pdf')) {
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            } else {
+                showError('请上传PDF文件');
+            }
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const file = fileInput.files[0];
+            if (!file) {
+                showError('请选择文件');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('use_ocr', document.getElementById('useOcr').checked);
+
+            submitBtn.disabled = true;
+            loading.classList.add('show');
+            error.classList.remove('show');
+
+            try {
+                const response = await fetch('/pdf-to-excel', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    // 下载文件
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = file.name.replace('.pdf', '.xlsx');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    loading.innerHTML = '<p style="color: #4caf50;">✅ 处理完成，文件已下载！</p>';
+                } else {
+                    const data = await response.json();
+                    showError(data.error || '处理失败，请重试');
+                }
+            } catch (err) {
+                showError('网络错误，请重试');
+            } finally {
+                setTimeout(() => {
+                    loading.classList.remove('show');
+                    loading.innerHTML = '<div class="spinner"></div><p>正在处理PDF，请稍候...</p>';
+                    submitBtn.disabled = false;
+                }, 3000);
+            }
+        });
+
+        function showError(msg) {
+            error.textContent = '❌ ' + msg;
+            error.classList.add('show');
+        }
+    </script>
+</body>
+</html>

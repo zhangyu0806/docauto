@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word模板生成 - 企业文档自动化</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .upload-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .upload-area.filled {
+            border-color: #4caf50;
+            background: #e8f5e9;
+        }
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        .upload-label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .upload-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .upload-btn:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+        .file-status {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #4caf50;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .loading.show {
+            display: block;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .tips {
+            margin-top: 30px;
+            padding: 15px;
+            background: #fff3e0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .tips h3 {
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+        .tips code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .tips ul {
+            margin-left: 20px;
+        }
+        .tips li {
+            margin-bottom: 5px;
+        }
+        @media (max-width: 600px) {
+            .upload-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回首页</a>
+        
+        <h1>📝 Word模板批量生成</h1>
+        <p class="subtitle">基于Word模板自动填充数据，批量生成文档</p>
+
+        <form id="uploadForm">
+            <div class="upload-section">
+                <div class="upload-area" id="templateArea">
+                    <div class="upload-icon">📄</div>
+                    <div class="upload-label">Word模板</div>
+                    <label class="upload-btn">
+                        选择模板
+                        <input type="file" id="templateInput" accept=".docx" required>
+                    </label>
+                    <div class="file-status" id="templateStatus"></div>
+                </div>
+
+                <div class="upload-area" id="dataArea">
+                    <div class="upload-icon">📊</div>
+                    <div class="upload-label">数据文件</div>
+                    <label class="upload-btn">
+                        选择数据
+                        <input type="file" id="dataInput" accept=".json,.xlsx,.xls" required>
+                    </label>
+                    <div class="file-status" id="dataStatus"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>批量生成文档</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在生成文档，请稍候...</p>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="tips">
+            <h3>💡 使用说明</h3>
+            <ul>
+                <li><strong>模板语法：</strong>使用Jinja2语法，如 <code>{{公司名称}}</code>、<code>{{日期}}</code></li>
+                <li><strong>数据文件：</strong>支持JSON数组或Excel文件</li>
+                <li><strong>JSON格式：</strong><code>[{"name": "A"}, {"name": "B"}]</code></li>
+                <li><strong>Excel格式：</strong>第一行为列名，对应模板变量</li>
+                <li><strong>输出：</strong>所有生成的文档会打包成ZIP文件下载</li>
+            </ul>
+            <p style="margin-top: 10px;"><strong>示例模板：</strong></p>
+            <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-size: 0.85rem;">
+合同编号：{{合同编号}}
+甲方：{{甲方名称}}
+乙方：{{乙方名称}}
+金额：{{合同金额}}元
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const templateInput = document.getElementById('templateInput');
+        const dataInput = document.getElementById('dataInput');
+        const templateStatus = document.getElementById('templateStatus');
+        const dataStatus = document.getElementById('dataStatus');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+
+        let templateFile = null;
+        let dataFile = null;
+
+        templateInput.addEventListener('change', function() {
+            if (this.files[0]) {
+                templateFile = this.files[0];
+                templateStatus.innerHTML = `✅ ${templateFile.name}`;
+                document.getElementById('templateArea').classList.add('filled');
+                checkReady();
+            }
+        });
+
+        dataInput.addEventListener('change', function() {
+            if (this.files[0]) {
+                dataFile = this.files[0];
+                dataStatus.innerHTML = `✅ ${dataFile.name}`;
+                document.getElementById('dataArea').classList.add('filled');
+                checkReady();
+            }
+        });
+
+        function checkReady() {
+            submitBtn.disabled = !(templateFile && dataFile);
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!templateFile || !dataFile) {
+                showError('请同时上传模板和数据文件');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('template', templateFile);
+            formData.append('data', dataFile);
+
+            submitBtn.disabled = true;
+            loading.classList.add('show');
+            error.classList.remove('show');
+
+            try {
+                const response = await fetch('/template-generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'generated_documents.zip';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    loading.innerHTML = '<p style="color: #4caf50;">✅ 生成完成，文件已下载！</p>';
+                } else {
+                    const data = await response.json();
+                    showError(data.error || '处理失败，请重试');
+                }
+            } catch (err) {
+                showError('网络错误，请重试');
+            } finally {
+                setTimeout(() => {
+                    loading.classList.remove('show');
+                    loading.innerHTML = '<div class="spinner"></div><p>正在生成文档，请稍候...</p>';
+                    submitBtn.disabled = false;
+                }, 3000);
+            }
+        });
+
+        function showError(msg) {
+            error.textContent = '❌ ' + msg;
+            error.classList.add('show');
+        }
+    </script>
+</body>
+</html>

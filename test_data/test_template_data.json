@@ -1,0 +1,32 @@
+[
+  {
+    "party_a": "Acme Corp",
+    "party_b": "Tech Solutions Ltd",
+    "project_name": "Document Automation System",
+    "amount": "50,000",
+    "start_date": "2026-03-01",
+    "end_date": "2026-06-30",
+    "terms": "Monthly payment, 30-day notice for termination",
+    "sign_date": "2026-02-26"
+  },
+  {
+    "party_a": "Global Finance Inc",
+    "party_b": "Data Processing Co",
+    "project_name": "Invoice Processing Service",
+    "amount": "30,000",
+    "start_date": "2026-04-01",
+    "end_date": "2026-09-30",
+    "terms": "Quarterly payment, quality guarantee",
+    "sign_date": "2026-02-26"
+  },
+  {
+    "party_a": "Legal Partners LLP",
+    "party_b": "DocAuto Team",
+    "project_name": "Contract Template System",
+    "amount": "20,000",
+    "start_date": "2026-03-15",
+    "end_date": "2026-05-15",
+    "terms": "Milestone-based payment",
+    "sign_date": "2026-02-26"
+  }
+]
